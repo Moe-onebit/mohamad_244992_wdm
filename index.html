@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet" />
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+        <style>
+            body {
+                background-color: whitesmoke;
+            }
+            #data-preprocessing {
+                max-width: 60%;
+            }
+            #main-table-div {
+                margin: auto;
+                text-align: center;
+                width: 50%;
+            }
+            table>thead {
+                background-color: lightblue;
+            }
+            table tbody tr.odd{
+                background-color: lightgrey;
+            }
+            table tbody tr.even{
+                background-color: rgb(233, 227, 227);
+            }
+            p {
+                font-size: large;
+                font-family: sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Report</h1>
+        <div id="data-preprocessing">
+            <h2>Data Preprocessing</h2>
+            <h3>Missing values</h3>
+            <p>
+                There are a lots of records with null values in this data, also they appeared together, i.e. almost
+                all columns in a given row are null when one of them is null.
+                <br />
+                This is critical finding since replacing those values by some value (the mean for example) will hurt
+                the performance since replacing those with the mean will result in multiple row with almost the same
+                values but with different labels.
+                <br />
+                So after we discard the rows that have a null value in one of the most informative columns we got better
+                results.
+            </p>
+            <h3>Normalization</h3>
+            <p>
+                Normalization is essential, especially for models like Logistic Regression which depends on the
+                numerical values.
+                <br />
+                This is because large values will be considered more important in those models, because solving 
+                the optimization problem for this models usually done with an iterative algorithm, like gradient descent,
+                that take a step with a value proportional to the gradient.
+                <br />
+                Features with larger values changes by larger values, so the gradient will be bigger in the direction
+                of those features, and that why they will be considered more important.
+                <br />
+                Normalization solves this issue, by scaling the features to be on the same scale, so this may
+                be interpreted as having a uniform priori distribution on the features importance.
+            </p>
+            <h3>Final note</h3>
+            <p>
+                After converting some null values through the process of categorizing, those values were converted to -1
+                and this cause some problems to Decision Trees, and Naive Bayes which needs all values to be non-negative.
+                <br />
+                To solve this problem we shift the mean of the data to be 1 instead of 0, this did not hurt the performance.
+            </p>
+        </div>
+        <div id="main-table-div">
+            <table id="results-table" class="table stripe hover bordered table-sm">
+                <thead>
+                    <th>Algorithm</th>
+                    <th>Accuracy</th>
+                    <th>F1</th>
+                    <th>Precision</th>
+                    <th>Recall</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Logistic Regression</td>
+                        <td>0.261748</td>
+                        <td>0.109715</td>
+                        <td>0.140878</td>
+                        <td>0.261748</td>
+                    </tr>
+                    <tr>
+                        <td>Decision Tree</td>
+                        <td>0.583431 </td>
+                        <td>0.583864</td>
+                        <td>0.584382</td>
+                        <td>0.583431</td>
+                    </tr>
+                    <tr>
+                        <td>Naive Bayes</td>
+                        <td>0.071332</td>
+                        <td>0.018514</td>
+                        <td>0.121920</td>
+                        <td>0.071332</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="discussion">
+            <h2>Conclusion</h2>
+            <p>
+                As we can see from the table, the Decision Tree model achieve the best results across the 4 metrics.
+            </p>
+            <p>
+                It is reasonable that Decision Tree is better than Logistic Regression since most of our features are
+                categorical.
+                <br />
+                This often means that the boundary between each class and the others is non-linear.
+                <br />
+                But Logistic Regression
+                assumes that we can separate each class from the others by a line (because we used Softmax which do that).
+            </p>
+            <p>
+                On the other hand, Naive Bayes also did poorly, and this means that the features are correlated somehow, which violates
+                the assumption of Naive Bayes.
+            </p>
+        </div>
+        
+        <script>
+            $(document).ready(function () {
+                
+                $('#results-table').DataTable({
+                    "dom": "t"
+                });
+            });
+        </script>
+    </body>
+</html>
